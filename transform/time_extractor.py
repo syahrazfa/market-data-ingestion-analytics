@@ -9,7 +9,7 @@ from psycopg2.extras import execute_batch
 # ENV
 # =========================================================
 BASE_DIR = Path(__file__).resolve().parents[1]
-load_dotenv(BASE_DIR / "config" / "setting.env")
+load_dotenv(BASE_DIR / "config" / "settingc.env")
 
 DB_PARAMS = {
     "dbname": os.getenv("DB_NAME"),
@@ -56,28 +56,30 @@ def build_dim_time(timestamps):
     rows = []
 
     for ts in timestamps:
-        utc = datetime.fromtimestamp(ts, tz=timezone.utc)
+        # normalize timestamp (ms → s if needed)
+        ts_sec = ts / 1000 if ts > 10_000_000_000 else ts
+
+        utc = datetime.fromtimestamp(ts_sec, tz=timezone.utc)
         iso = utc.isocalendar()
 
         session = get_session(utc.hour)
 
         rows.append((
-            ts,                     # epoch
-            utc,                    # full UTC timestamp
-            utc.date(),             # date
+            ts,                     # original epoch (keep raw)
+            utc,
+            utc.date(),
             utc.year,
             utc.month,
             utc.day,
             utc.hour,
             utc.minute,
-            iso.week,               # ISO week number
-            utc.weekday(),          # 0=Mon, 6=Sun
-            utc.weekday() >= 5,     # is_weekend
-            session                 # trading session
+            iso.week,
+            utc.weekday(),
+            utc.weekday() >= 5,
+            session
         ))
 
     return rows
-
 # =========================================================
 # INSERT INTO silver.dim_time
 # =========================================================
