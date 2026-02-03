@@ -9,7 +9,7 @@ from psycopg2.extras import execute_batch
 # ENV
 # =========================================================
 BASE_DIR = Path(__file__).resolve().parents[1]
-load_dotenv(BASE_DIR / "config" / "settingc.env")
+load_dotenv(BASE_DIR / "config" / "setting.env")
 
 DB_PARAMS = {
     "dbname": os.getenv("DB_NAME"),
