@@ -26,7 +26,7 @@ def get_conn():
 
 def build_1h_vohlc(conn):
     with conn.cursor() as cur:
-        cur.executemany("""
+        cur.execute("""
         CREATE OR REPLACE VIEW silver.v_ohlc_1h AS
         SELECT
             *,
@@ -46,7 +46,7 @@ def build_1h_vohlc(conn):
 
 def build_4h_vohlc(conn):
     with conn.cursor() as cur:
-        cur.executemany("""
+        cur.execute("""
         CREATE OR REPLACE VIEW silver.v_ohlc_4h AS
         SELECT
             *,
@@ -65,7 +65,7 @@ def build_4h_vohlc(conn):
 
 def build_1d_vohlc(conn):
     with conn.cursor() as cur:
-        cur.executemany("""
+        cur.execute("""
         CREATE OR REPLACE VIEW silver.v_ohlc_1d AS
         SELECT
             *,
@@ -85,7 +85,7 @@ def build_1d_vohlc(conn):
 
 def build_1w_vohlc(conn):
     with conn.cursor() as cur:
-        cur.executemany("""
+        cur.execute("""
         CREATE OR REPLACE VIEW silver.v_ohlc_1w AS
         SELECT
             *,
@@ -105,7 +105,7 @@ def build_1w_vohlc(conn):
 
 def build_1mth_vohlc(conn):
     with conn.cursor() as cur:
-        cur.executemany("""
+        cur.execute("""
         CREATE OR REPLACE VIEW silver.v_ohlc_1mth AS
         SELECT
             *,
