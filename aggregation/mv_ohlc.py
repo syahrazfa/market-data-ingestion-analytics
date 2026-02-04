@@ -26,7 +26,7 @@ def get_conn():
 
 def build_1h_ohlc(conn):
     with conn.cursor() as cur:
-        cur.execute("""
+        cur.executemany("""
         CREATE MATERIALIZED VIEW silver.mv_ohlc_1h AS
         SELECT DISTINCT
             symbol,
@@ -63,7 +63,7 @@ def build_1h_ohlc(conn):
 
 def build_4h_ohlc(conn):
     with conn.cursor() as cur:
-        cur.execute("""
+        cur.executemany("""
         CREATE MATERIALIZED VIEW silver.mv_ohlc_4h AS
         SELECT DISTINCT
             symbol,
@@ -102,7 +102,7 @@ def build_4h_ohlc(conn):
 
 def build_1d_ohlc(conn):
     with conn.cursor() as cur:
-        cur.execute("""
+        cur.executemany("""
         CREATE MATERIALIZED VIEW silver.mv_ohlc_1d AS
         SELECT DISTINCT
             symbol,
@@ -118,6 +118,80 @@ def build_1d_ohlc(conn):
                 symbol,
                 exchange,
                 date_trunc('day', utc_timestamp) AS tf_time,
+                open,
+                high,
+                low,
+                close,
+                volume,
+                utc_timestamp
+            FROM silver.v_candles
+        ) t
+        WINDOW w AS (
+            PARTITION BY symbol, exchange, tf_time
+            ORDER BY utc_timestamp
+            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        );
+        """)
+
+# =========================================================
+# 1W
+# =========================================================
+
+def build_1w_ohlc(conn):
+    with conn.cursor() as cur:
+        cur.executemany("""
+        CREATE MATERIALIZED VIEW silver.mv_ohlc_1w AS
+        SELECT DISTINCT
+            symbol,
+            exchange,
+            tf_time,
+            FIRST_VALUE(open)  OVER w AS open,
+            MAX(high)          OVER w AS high,
+            MIN(low)           OVER w AS low,
+            LAST_VALUE(close)  OVER w AS close,
+            SUM(volume)        OVER w AS volume
+        FROM (
+            SELECT
+                symbol,
+                exchange,
+                date_trunc('week', utc_timestamp) AS tf_time,
+                open,
+                high,
+                low,
+                close,
+                volume,
+                utc_timestamp
+            FROM silver.v_candles
+        ) t
+        WINDOW w AS (
+            PARTITION BY symbol, exchange, tf_time
+            ORDER BY utc_timestamp
+            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        );
+        """)
+
+# =========================================================
+# 1D
+# =========================================================
+
+def build_1mth_ohlc(conn):
+    with conn.cursor() as cur:
+        cur.executemany("""
+        CREATE MATERIALIZED VIEW silver.mv_ohlc_1mth AS
+        SELECT DISTINCT
+            symbol,
+            exchange,
+            tf_time,
+            FIRST_VALUE(open)  OVER w AS open,
+            MAX(high)          OVER w AS high,
+            MIN(low)           OVER w AS low,
+            LAST_VALUE(close)  OVER w AS close,
+            SUM(volume)        OVER w AS volume
+        FROM (
+            SELECT
+                symbol,
+                exchange,
+                date_trunc('month', utc_timestamp) AS tf_time,
                 open,
                 high,
                 low,
