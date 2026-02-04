@@ -127,7 +127,7 @@ def insert_into_dim_time(conn, rows):
                 session,
                 is_london_killzone,
                 is_ny_killzone
-                is_london_ny_overlap
+                is_ny_london_overlap
             )
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (epoch) DO NOTHING
