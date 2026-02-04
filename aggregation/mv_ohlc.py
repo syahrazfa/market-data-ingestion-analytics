@@ -88,7 +88,7 @@ def build_4h_ohlc(conn):
                 volume,
                 utc_timestamp
             FROM silver.v_candles
-        ) t
+        ) 
         WINDOW w AS (
             PARTITION BY symbol, exchange, tf_time
             ORDER BY utc_timestamp
@@ -125,7 +125,7 @@ def build_1d_ohlc(conn):
                 volume,
                 utc_timestamp
             FROM silver.v_candles
-        ) t
+        ) 
         WINDOW w AS (
             PARTITION BY symbol, exchange, tf_time
             ORDER BY utc_timestamp
@@ -162,7 +162,7 @@ def build_1w_ohlc(conn):
                 volume,
                 utc_timestamp
             FROM silver.v_candles
-        ) t
+        ) 
         WINDOW w AS (
             PARTITION BY symbol, exchange, tf_time
             ORDER BY utc_timestamp
@@ -199,7 +199,7 @@ def build_1mth_ohlc(conn):
                 volume,
                 utc_timestamp
             FROM silver.v_candles
-        ) t
+        ) 
         WINDOW w AS (
             PARTITION BY symbol, exchange, tf_time
             ORDER BY utc_timestamp
