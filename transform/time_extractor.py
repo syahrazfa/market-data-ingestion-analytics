@@ -35,6 +35,18 @@ def get_distinct_timestamp(conn):
        return [row[0] for row in cur.fetchall()]
 
 # =========================================================
+# GET EXISTING TIMESTAMP
+# =========================================================
+
+def get_existing_dim_timestamps(conn):
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT epoch
+            FROM silver.dim_time
+        """)
+        return {row[0] for row in cur.fetchall()}
+
+# =========================================================
 # SESSION CHECKER
 # =========================================================
 
@@ -110,11 +122,22 @@ def insert_into_dim_time(conn, rows):
 def run():
     conn = get_conn()
 
-    timestamps = get_distinct_timestamp(conn)
-    rows = build_dim_time(timestamps)
+    raw_ts = get_distinct_timestamp(conn)
+    existing_ts = get_existing_dim_timestamps(conn)
+
+    new_ts = [ts for ts in raw_ts if ts not in existing_ts]
+
+    if not new_ts:
+        print("[dim_time] no new timestamps")
+        conn.close()
+        return
+
+    rows = build_dim_time(new_ts)
     insert_into_dim_time(conn, rows)
 
+    print(f"[dim_time] inserted {len(rows)} rows")
     conn.close()
+
 
 if __name__ == '__main__':
     run()

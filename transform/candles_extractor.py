@@ -22,9 +22,22 @@ def get_conn():
     return psycopg2.connect(**DB_PARAMS)
 
 # =========================================================
+# LAST TS
+# =========================================================
+
+def get_max_timestamp_fact(conn):
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT COALESCE(MAX(timestamp), 0)
+            FROM silver.fact_candles
+        """)
+        return cur.fetchone()[0]
+
+
+# =========================================================
 # FETCH RAW CANDLES
 # =========================================================
-def fetch_raw_candles(conn):
+def fetch_raw_candles(conn, last_ts):
     with conn.cursor() as cur:
         cur.execute("""
             SELECT
@@ -39,7 +52,9 @@ def fetch_raw_candles(conn):
                 exchange
             FROM bronze.raw_ohlc
             WHERE interval = '1m'
-        """)
+              AND timestamp > %s
+            ORDER BY timestamp  
+        """, (last_ts,))
         return cur.fetchall()
 
 # =========================================================
@@ -67,9 +82,18 @@ def insert_fact_candles(conn, rows):
 
 def run():
     conn = get_conn()
-    rows = fetch_raw_candles(conn)
-    insert_fact_candles(conn, rows)
+
+    last_ts = get_max_timestamp_fact(conn)
+    rows = fetch_raw_candles(conn, last_ts)
+
+    if rows:
+        insert_fact_candles(conn, rows)
+        print(f"[fact_candles] inserted {len(rows)} rows")
+    else:
+        print("[fact_candles] no new data")
+
     conn.close()
+
 
 if __name__ == "__main__":
     run()
