@@ -27,7 +27,7 @@ def get_conn():
 def build_1h_ohlc(conn):
     with conn.cursor() as cur:
         cur.execute("""
-        CREATE MATERIALIZED VIEW silver.mv_ohlc_1h AS
+        CREATE MATERIALIZED VIEW IF NOT EXISTS silver.mv_ohlc_1h AS
         SELECT DISTINCT
             symbol,
             exchange,
@@ -64,7 +64,7 @@ def build_1h_ohlc(conn):
 def build_4h_ohlc(conn):
     with conn.cursor() as cur:
         cur.execute("""
-        CREATE MATERIALIZED VIEW silver.mv_ohlc_4h AS
+        CREATE MATERIALIZED VIEW IF NOT EXISTS silver.mv_ohlc_4h AS
         SELECT DISTINCT
             symbol,
             exchange,
@@ -103,7 +103,7 @@ def build_4h_ohlc(conn):
 def build_1d_ohlc(conn):
     with conn.cursor() as cur:
         cur.execute("""
-        CREATE MATERIALIZED VIEW silver.mv_ohlc_1d AS
+        CREATE MATERIALIZED VIEW IF NOT EXISTS silver.mv_ohlc_1d AS
         SELECT DISTINCT
             symbol,
             exchange,
@@ -140,7 +140,7 @@ def build_1d_ohlc(conn):
 def build_1w_ohlc(conn):
     with conn.cursor() as cur:
         cur.execute("""
-        CREATE MATERIALIZED VIEW silver.mv_ohlc_1w AS
+        CREATE MATERIALIZED VIEW IF NOT EXISTS silver.mv_ohlc_1w AS
         SELECT DISTINCT
             symbol,
             exchange,
@@ -177,7 +177,7 @@ def build_1w_ohlc(conn):
 def build_1mth_ohlc(conn):
     with conn.cursor() as cur:
         cur.execute("""
-        CREATE MATERIALIZED VIEW silver.mv_ohlc_1mth AS
+        CREATE MATERIALIZED VIEW IF NOT EXISTS silver.mv_ohlc_1mth AS
         SELECT DISTINCT
             symbol,
             exchange,
