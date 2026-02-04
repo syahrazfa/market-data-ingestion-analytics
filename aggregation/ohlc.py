@@ -103,7 +103,7 @@ def build_4h_ohlc(conn):
 def build_1d_ohlc(conn):
     with conn.cursor() as cur:
         cur.execute("""
-        CREATE MATERIALIZED VIEW silver.mv_ohlc_1h AS
+        CREATE MATERIALIZED VIEW silver.mv_ohlc_1d AS
         SELECT DISTINCT
             symbol,
             exchange,
