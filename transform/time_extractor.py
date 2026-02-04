@@ -80,6 +80,9 @@ def build_dim_time(timestamps):
         is_london_killzone = 7 <= hour < 10
         is_ny_killzone = 12 <= hour < 15
 
+        # session overlaps
+        is_london_ny_overlap = 13 <= hour < 16
+
         session = get_session(hour)
 
         rows.append((
@@ -96,7 +99,8 @@ def build_dim_time(timestamps):
             utc.weekday() >= 5,
             session,
             is_london_killzone,
-            is_ny_killzone
+            is_ny_killzone,
+            is_london_ny_overlap
         ))
 
     return rows
@@ -123,8 +127,9 @@ def insert_into_dim_time(conn, rows):
                 session,
                 is_london_killzone,
                 is_ny_killzone
+                is_london_ny_overlap
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (epoch) DO NOTHING
         """, rows, page_size=1000)
 
