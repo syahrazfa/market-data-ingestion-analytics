@@ -68,17 +68,23 @@ def build_dim_time(timestamps):
     rows = []
 
     for ts in timestamps:
-        # normalize timestamp (ms → s if needed)
+        # normalize epoch (ms → sec if needed)
         ts_sec = ts / 1000 if ts > 10_000_000_000 else ts
 
         utc = datetime.fromtimestamp(ts_sec, tz=timezone.utc)
         iso = utc.isocalendar()
 
-        session = get_session(utc.hour)
+        hour = utc.hour
+
+        # killzone flags (UTC)
+        is_london_killzone = 7 <= hour < 10
+        is_ny_killzone = 12 <= hour < 15
+
+        session = get_session(hour)
 
         rows.append((
-            ts,                     # original epoch (keep raw)
-            utc,
+            ts,                     # epoch (raw)
+            utc,                    # utc_timestamp
             utc.date(),
             utc.year,
             utc.month,
@@ -88,10 +94,13 @@ def build_dim_time(timestamps):
             iso.week,
             utc.weekday(),
             utc.weekday() >= 5,
-            session
+            session,
+            is_london_killzone,
+            is_ny_killzone
         ))
 
     return rows
+
 # =========================================================
 # INSERT INTO silver.dim_time
 # =========================================================
@@ -111,13 +120,16 @@ def insert_into_dim_time(conn, rows):
                 iso_week,
                 weekday,
                 is_weekend,
-                session
+                session,
+                is_london_killzone,
+                is_ny_killzone
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (epoch) DO NOTHING
         """, rows, page_size=1000)
 
     conn.commit()
+
 
 def run():
     conn = get_conn()
@@ -137,7 +149,6 @@ def run():
 
     print(f"[dim_time] inserted {len(rows)} rows")
     conn.close()
-
 
 if __name__ == '__main__':
     run()
