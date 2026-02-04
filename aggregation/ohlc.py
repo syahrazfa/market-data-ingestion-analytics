@@ -27,18 +27,19 @@ def get_conn():
 def build_1h_ohlc(conn):
     with conn.cursor() as cur:
         cur.execute("""
+        DROP MATERIALIZED VIEW IF EXISTS silver.mv_ohlc_1h;
+        
         CREATE MATERIALIZED VIEW silver.mv_ohlc_1h AS
-        SELECT 
+        SELECT
             symbol,
             exchange,
             date_trunc('hour', utc_timestamp) AS tf_time,
-            
+        
             FIRST_VALUE(open) OVER w AS open,
             MAX(high) AS high,
             MIN(low) AS low,
             LAST_VALUE(close) OVER w AS close,
             SUM(volume) AS volume
-            
         FROM silver.v_candles
         WINDOW w AS (
             PARTITION BY
@@ -58,6 +59,8 @@ def build_1h_ohlc(conn):
 def build_4h_ohlc(conn):
     with conn.cursor() as cur:
         cur.execute("""
+        DROP MATERIALIZED VIEW IF EXISTS silver.mv_ohlc_4h;
+        
         CREATE MATERIALIZED VIEW silver.mv_ohlc_4h AS
         SELECT
             symbol,
@@ -71,7 +74,6 @@ def build_4h_ohlc(conn):
             MIN(low) AS low,
             LAST_VALUE(close) OVER w AS close,
             SUM(volume) AS volume
-        
         FROM silver.v_candles
         WINDOW w AS (
             PARTITION BY
@@ -92,6 +94,8 @@ def build_4h_ohlc(conn):
 def build_1d_ohlc(conn):
     with conn.cursor() as cur:
         cur.execute("""
+        DROP MATERIALIZED VIEW IF EXISTS silver.mv_ohlc_1d;
+        
         CREATE MATERIALIZED VIEW silver.mv_ohlc_1d AS
         SELECT
             symbol,
@@ -103,7 +107,6 @@ def build_1d_ohlc(conn):
             MIN(low) AS low,
             LAST_VALUE(close) OVER w AS close,
             SUM(volume) AS volume
-        
         FROM silver.v_candles
         WINDOW w AS (
             PARTITION BY
