@@ -58,7 +58,7 @@ def build_1h_ohlc(conn):
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         );
         """)
-
+    conn.commit()
 # =========================================================
 # 4H
 # =========================================================
@@ -99,7 +99,7 @@ def build_4h_ohlc(conn):
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         );
         """)
-
+    conn.commit()
 # =========================================================
 # 1D
 # =========================================================
@@ -138,7 +138,7 @@ def build_1d_ohlc(conn):
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         );
         """)
-
+    conn.commit()
 # =========================================================
 # 1W
 # =========================================================
@@ -177,6 +177,7 @@ def build_1w_ohlc(conn):
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         );
         """)
+    conn.commit()
 
 # =========================================================
 # 1D
@@ -216,6 +217,7 @@ def build_1mth_ohlc(conn):
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         );
         """)
+    conn.commit()
 
 # =========================================================
 # RUN
