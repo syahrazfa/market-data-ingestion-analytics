@@ -42,7 +42,7 @@ Sources
 
 ## Data Model
 
-### Silver Layer – `y_ohlc_1d`
+### Silver Layer – `v_ohlc_1d`
 
 | Column        | Description                          |
 |--------------|--------------------------------------|
